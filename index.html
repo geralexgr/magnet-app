@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MagnetChain — Collect the World</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0a0e1a;
+    --deep: #0f1629;
+    --card: #141c35;
+    --border: #1e2d55;
+    --gold: #c9a84c;
+    --gold-light: #f0cc6a;
+    --gold-dim: #8a6f2e;
+    --white: #f0ead8;
+    --white-dim: #a09880;
+    --blue-glow: #2040a0;
+    --greece-blue: #0d5eaf;
+    --greece-white: #f5f5f0;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--navy);
+    color: var(--white);
+    font-family: 'Crimson Pro', Georgia, serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ─── STAR FIELD ─────────────────────────────────── */
+  #starfield {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    overflow: hidden;
+  }
+  .star {
+    position: absolute; border-radius: 50%;
+    background: white; opacity: 0;
+    animation: twinkle var(--d) var(--delay) infinite ease-in-out;
+  }
+  @keyframes twinkle {
+    0%,100% { opacity: 0; transform: scale(0.5); }
+    50%      { opacity: var(--op); transform: scale(1); }
+  }
+
+  /* ─── HEADER ─────────────────────────────────────── */
+  header {
+    position: relative; z-index: 10;
+    padding: 0 clamp(1.5rem, 5vw, 4rem);
+    display: flex; align-items: center; justify-content: space-between;
+    height: 72px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(10,14,26,0.92);
+    backdrop-filter: blur(12px);
+    position: sticky; top: 0;
+  }
+  .logo {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(0.9rem, 2.5vw, 1.15rem);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--gold);
+    text-shadow: 0 0 20px rgba(201,168,76,0.5);
+    display: flex; align-items: center; gap: 0.6rem;
+  }
+  .logo-icon { font-size: 1.4em; }
+
+  nav { display: flex; gap: 2rem; align-items: center; }
+  nav a {
+    font-family: 'Crimson Pro', serif;
+    font-size: 1rem; font-weight: 600;
+    color: var(--white-dim); text-decoration: none;
+    letter-spacing: 0.05em; text-transform: uppercase; font-size: 0.85rem;
+    transition: color 0.2s;
+  }
+  nav a:hover { color: var(--gold); }
+
+  .btn-connect {
+    background: transparent;
+    border: 1.5px solid var(--gold-dim);
+    color: var(--gold);
+    padding: 0.5rem 1.3rem;
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    cursor: pointer; border-radius: 3px;
+    transition: all 0.25s;
+    white-space: nowrap;
+  }
+  .btn-connect:hover {
+    background: var(--gold); color: var(--navy);
+    box-shadow: 0 0 20px rgba(201,168,76,0.4);
+  }
+  .btn-connect.connected {
+    border-color: #4caf7a; color: #4caf7a;
+    font-family: 'Crimson Pro', serif;
+    font-size: 0.85rem; font-weight: 600;
+    letter-spacing: 0.03em;
+  }
+
+  /* ─── HERO ───────────────────────────────────────── */
+  .hero {
+    position: relative; z-index: 2;
+    min-height: 75vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center;
+    padding: 6rem 2rem 4rem;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 80% 50% at 50% 0%, rgba(32,64,160,0.25) 0%, transparent 70%),
+      radial-gradient(ellipse 50% 40% at 20% 80%, rgba(13,94,175,0.15) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .hero-eyebrow {
+    font-family: 'Crimson Pro', serif;
+    font-size: 0.9rem; font-weight: 600;
+    letter-spacing: 0.3em; text-transform: uppercase;
+    color: var(--gold-dim); margin-bottom: 1.2rem;
+    opacity: 0; animation: fadeUp 0.7s 0.2s forwards;
+  }
+  .hero h1 {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(2.2rem, 7vw, 5.5rem);
+    font-weight: 900; line-height: 1.1;
+    color: var(--white);
+    text-shadow: 0 4px 40px rgba(201,168,76,0.2);
+    opacity: 0; animation: fadeUp 0.8s 0.35s forwards;
+    max-width: 14ch;
+  }
+  .hero h1 em {
+    font-style: italic;
+    color: var(--gold);
+    text-shadow: 0 0 40px rgba(201,168,76,0.5);
+  }
+  .hero-sub {
+    font-size: clamp(1rem, 2.5vw, 1.25rem);
+    font-weight: 300; color: var(--white-dim);
+    margin-top: 1.5rem; max-width: 52ch; line-height: 1.7;
+    opacity: 0; animation: fadeUp 0.8s 0.5s forwards;
+  }
+  .hero-cta {
+    margin-top: 3rem; display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;
+    opacity: 0; animation: fadeUp 0.8s 0.65s forwards;
+  }
+  .btn-primary {
+    background: var(--gold);
+    color: var(--navy);
+    border: none; padding: 0.85rem 2.2rem;
+    font-family: 'Cinzel Decorative', serif; font-size: 0.8rem;
+    letter-spacing: 0.1em; cursor: pointer; border-radius: 3px;
+    transition: all 0.25s;
+    box-shadow: 0 4px 24px rgba(201,168,76,0.35);
+  }
+  .btn-primary:hover { background: var(--gold-light); transform: translateY(-2px); box-shadow: 0 8px 32px rgba(201,168,76,0.5); }
+  .btn-secondary {
+    background: transparent; border: 1.5px solid var(--border);
+    color: var(--white-dim); padding: 0.85rem 2.2rem;
+    font-family: 'Cinzel Decorative', serif; font-size: 0.8rem;
+    letter-spacing: 0.1em; cursor: pointer; border-radius: 3px;
+    transition: all 0.25s;
+  }
+  .btn-secondary:hover { border-color: var(--gold-dim); color: var(--gold); }
+
+  .hero-stats {
+    margin-top: 4rem; display: flex; gap: 3rem; flex-wrap: wrap; justify-content: center;
+    opacity: 0; animation: fadeUp 0.8s 0.8s forwards;
+  }
+  .stat { text-align: center; }
+  .stat-num {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 1.8rem; color: var(--gold); line-height: 1;
+  }
+  .stat-label {
+    font-size: 0.8rem; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--white-dim); margin-top: 0.3rem;
+  }
+  .stat-divider { width: 1px; background: var(--border); align-self: stretch; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ─── SECTION HEADERS ───────────────────────────── */
+  .section-label {
+    font-size: 0.78rem; letter-spacing: 0.3em; text-transform: uppercase;
+    color: var(--gold-dim); margin-bottom: 0.8rem;
+  }
+  .section-title {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(1.5rem, 4vw, 2.5rem);
+    color: var(--white); line-height: 1.2;
+  }
+
+  /* ─── MAGNETS SECTION ───────────────────────────── */
+  #collect {
+    position: relative; z-index: 2;
+    padding: 6rem clamp(1.5rem, 5vw, 5rem);
+  }
+  .collect-header { text-align: center; margin-bottom: 4rem; }
+  .collect-header p {
+    color: var(--white-dim); font-size: 1.1rem;
+    max-width: 50ch; margin: 1rem auto 0;
+    font-weight: 300; line-height: 1.6;
+  }
+
+  .magnets-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+    max-width: 1200px; margin: 0 auto;
+  }
+
+  /* ─── MAGNET CARD ───────────────────────────────── */
+  .magnet-card {
+    position: relative;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.35s cubic-bezier(0.23,1,0.32,1), box-shadow 0.35s;
+    cursor: pointer;
+  }
+  .magnet-card:hover {
+    transform: translateY(-8px) rotate(-0.5deg);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px var(--gold-dim), 0 0 40px rgba(201,168,76,0.1);
+  }
+
+  /* Greece magnet specific design */
+  .magnet-greece .magnet-visual {
+    height: 220px;
+    background:
+      linear-gradient(180deg, #87ceeb 0%, #5aabdb 40%, #0d5eaf 40%, #0d5eaf 47%,
+        white 47%, white 52%, #0d5eaf 52%, #0d5eaf 59%,
+        white 59%, white 64%, #0d5eaf 64%, #0d5eaf 71%,
+        white 71%, white 76%, #0d5eaf 76%, #0d5eaf 83%,
+        white 83%, white 88%, #0d5eaf 88%, #0d5eaf 95%,
+        white 95%, white 100%);
+    position: relative; overflow: hidden;
+  }
+  .magnet-greece .magnet-visual::before {
+    content: '';
+    position: absolute; top: 0; left: 0;
+    width: 38%; height: 57.5%;
+    background: #0d5eaf;
+  }
+  .magnet-greece .magnet-visual::after {
+    content: '';
+    position: absolute; top: 0; left: 0;
+    width: 38%; height: 57.5%;
+    background:
+      /* white cross horizontal */
+      linear-gradient(transparent 38%, white 38%, white 62%, transparent 62%),
+      /* white cross vertical */
+      linear-gradient(90deg, transparent 38%, white 38%, white 62%, transparent 62%),
+      var(--greece-blue);
+  }
+
+  /* Acropolis silhouette overlay */
+  .magnet-greece .acropolis {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    height: 80px;
+    background:
+      linear-gradient(transparent 30%, rgba(10,14,26,0.6) 100%);
+  }
+  .magnet-greece .acropolis svg {
+    position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+    opacity: 0.85;
+  }
+
+  .magnet-sun {
+    position: absolute; top: 18px; right: 18px;
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #ffe066, #f0a500);
+    box-shadow: 0 0 20px rgba(255,224,102,0.7);
+    animation: pulseSun 3s ease-in-out infinite;
+  }
+  @keyframes pulseSun { 0%,100% { box-shadow: 0 0 20px rgba(255,224,102,0.6); } 50% { box-shadow: 0 0 35px rgba(255,224,102,0.9); } }
+
+  .magnet-info {
+    padding: 1.4rem 1.6rem 1.6rem;
+  }
+  .magnet-country {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 1.2rem; font-weight: 700; color: var(--white);
+    display: flex; align-items: center; gap: 0.6rem;
+  }
+  .magnet-flag-emoji { font-size: 1.3em; }
+  .magnet-desc {
+    font-size: 0.95rem; color: var(--white-dim);
+    margin-top: 0.5rem; line-height: 1.55; font-weight: 300;
+    font-style: italic;
+  }
+  .magnet-meta {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-top: 1.2rem; padding-top: 1rem;
+    border-top: 1px solid var(--border);
+  }
+  .magnet-price {
+    display: flex; flex-direction: column;
+  }
+  .price-label {
+    font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--white-dim);
+  }
+  .price-value {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 1.1rem; color: var(--gold);
+  }
+  .price-usd { font-size: 0.75rem; color: var(--white-dim); margin-top: 0.1rem; }
+
+  .magnet-supply {
+    text-align: right;
+  }
+  .supply-label { font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--white-dim); }
+  .supply-bar {
+    width: 80px; height: 4px; background: var(--border);
+    border-radius: 2px; margin-top: 0.4rem; overflow: hidden;
+  }
+  .supply-fill {
+    height: 100%; border-radius: 2px;
+    background: linear-gradient(90deg, var(--gold-dim), var(--gold));
+    animation: barFill 1.5s 0.5s both;
+  }
+  @keyframes barFill { from { width: 0; } }
+  .supply-count { font-size: 0.75rem; color: var(--white-dim); margin-top: 0.3rem; }
+
+  .btn-mint {
+    width: 100%; margin-top: 1.2rem;
+    background: linear-gradient(135deg, var(--gold-dim), var(--gold));
+    color: var(--navy); border: none; padding: 0.8rem;
+    font-family: 'Cinzel Decorative', serif; font-size: 0.78rem;
+    letter-spacing: 0.1em; cursor: pointer; border-radius: 6px;
+    transition: all 0.25s;
+    box-shadow: 0 4px 16px rgba(201,168,76,0.25);
+    position: relative; overflow: hidden;
+  }
+  .btn-mint::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.2) 50%, transparent 100%);
+    transform: translateX(-100%);
+    transition: transform 0.5s;
+  }
+  .btn-mint:hover { transform: translateY(-1px); box-shadow: 0 8px 28px rgba(201,168,76,0.45); }
+  .btn-mint:hover::after { transform: translateX(100%); }
+  .btn-mint:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+  .btn-mint.loading { opacity: 0.7; cursor: wait; }
+
+  .coming-soon-card {
+    opacity: 0.5;
+    background: repeating-linear-gradient(
+      45deg, var(--card) 0px, var(--card) 10px,
+      rgba(30,45,85,0.5) 10px, rgba(30,45,85,0.5) 20px
+    );
+  }
+  .coming-soon-badge {
+    position: absolute; top: 1rem; right: 1rem;
+    background: var(--border); color: var(--white-dim);
+    font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase;
+    padding: 0.3rem 0.7rem; border-radius: 20px; border: 1px solid var(--border);
+  }
+
+  /* ─── HOW IT WORKS ──────────────────────────────── */
+  #how {
+    position: relative; z-index: 2;
+    padding: 6rem clamp(1.5rem, 5vw, 5rem);
+    background: linear-gradient(180deg, transparent, rgba(15,22,41,0.8), transparent);
+  }
+  .how-header { text-align: center; margin-bottom: 4rem; }
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 2rem; max-width: 1000px; margin: 0 auto;
+  }
+  .step {
+    text-align: center; padding: 2rem 1.5rem;
+    border: 1px solid var(--border); border-radius: 10px;
+    background: var(--card);
+    transition: border-color 0.3s, transform 0.3s;
+  }
+  .step:hover { border-color: var(--gold-dim); transform: translateY(-4px); }
+  .step-num {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 2.5rem; color: var(--gold); opacity: 0.3; line-height: 1;
+  }
+  .step-icon { font-size: 2rem; margin: 0.5rem 0; }
+  .step h3 {
+    font-family: 'Cinzel Decorative', serif; font-size: 0.9rem;
+    color: var(--white); margin-bottom: 0.6rem;
+  }
+  .step p { font-size: 0.95rem; color: var(--white-dim); line-height: 1.6; font-weight: 300; }
+
+  /* ─── MY COLLECTION ─────────────────────────────── */
+  #collection {
+    position: relative; z-index: 2;
+    padding: 6rem clamp(1.5rem, 5vw, 5rem);
+  }
+  .collection-header { text-align: center; margin-bottom: 3rem; }
+  .collection-empty {
+    text-align: center; padding: 4rem 2rem;
+    border: 1px dashed var(--border); border-radius: 12px;
+    max-width: 500px; margin: 0 auto;
+    color: var(--white-dim);
+  }
+  .collection-empty-icon { font-size: 3rem; margin-bottom: 1rem; }
+  .collection-empty p { font-size: 1rem; line-height: 1.6; font-weight: 300; }
+
+  .nft-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 1.5rem; max-width: 1000px; margin: 0 auto;
+  }
+  .nft-item {
+    border: 1px solid var(--gold-dim);
+    border-radius: 10px; overflow: hidden;
+    background: var(--card);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .nft-item:hover { transform: scale(1.04); box-shadow: 0 8px 30px rgba(201,168,76,0.2); }
+  .nft-visual {
+    height: 120px;
+    background: linear-gradient(135deg, #0d5eaf, #87ceeb);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2.5rem;
+  }
+  .nft-label {
+    padding: 0.7rem; text-align: center;
+    font-family: 'Cinzel Decorative', serif; font-size: 0.7rem;
+    color: var(--gold);
+  }
+
+  /* ─── MODAL ─────────────────────────────────────── */
+  .modal-overlay {
+    position: fixed; inset: 0; z-index: 100;
+    background: rgba(0,0,0,0.8); backdrop-filter: blur(6px);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.3s;
+    padding: 1rem;
+  }
+  .modal-overlay.active { opacity: 1; pointer-events: all; }
+  .modal {
+    background: var(--deep);
+    border: 1px solid var(--gold-dim);
+    border-radius: 14px; max-width: 480px; width: 100%;
+    padding: 2.5rem;
+    transform: scale(0.95) translateY(20px);
+    transition: transform 0.35s cubic-bezier(0.23,1,0.32,1);
+    position: relative;
+  }
+  .modal-overlay.active .modal { transform: scale(1) translateY(0); }
+  .modal-close {
+    position: absolute; top: 1rem; right: 1.2rem;
+    background: none; border: none; color: var(--white-dim);
+    font-size: 1.5rem; cursor: pointer; transition: color 0.2s;
+  }
+  .modal-close:hover { color: var(--white); }
+  .modal-title {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 1.3rem; color: var(--gold); margin-bottom: 0.5rem;
+  }
+  .modal-sub { color: var(--white-dim); font-size: 0.95rem; margin-bottom: 2rem; line-height: 1.5; }
+  .modal-details { margin-bottom: 2rem; }
+  .detail-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0.75rem 0; border-bottom: 1px solid var(--border);
+    font-size: 0.95rem;
+  }
+  .detail-row:last-child { border-bottom: none; }
+  .detail-key { color: var(--white-dim); }
+  .detail-val { color: var(--white); font-weight: 600; font-family: 'Cinzel Decorative', serif; font-size: 0.85rem; }
+  .detail-val.gold { color: var(--gold); }
+
+  .modal-notice {
+    background: rgba(32,64,160,0.15);
+    border: 1px solid var(--blue-glow);
+    border-radius: 6px; padding: 0.9rem 1rem;
+    font-size: 0.85rem; color: #7090d0; margin-bottom: 1.5rem;
+    line-height: 1.5;
+  }
+
+  .tx-status {
+    display: none; text-align: center; padding: 1.5rem;
+  }
+  .tx-status.visible { display: block; }
+  .tx-spinner {
+    width: 40px; height: 40px; border-radius: 50%;
+    border: 3px solid var(--border); border-top-color: var(--gold);
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 1rem;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .tx-success { font-size: 2.5rem; margin-bottom: 0.5rem; }
+  .tx-msg { color: var(--white-dim); font-size: 0.9rem; line-height: 1.5; }
+  .tx-hash {
+    font-size: 0.75rem; color: var(--gold-dim);
+    word-break: break-all; margin-top: 0.5rem;
+    font-family: 'Courier New', monospace;
+  }
+
+  /* ─── FOOTER ─────────────────────────────────────── */
+  footer {
+    position: relative; z-index: 2;
+    border-top: 1px solid var(--border);
+    padding: 3rem clamp(1.5rem, 5vw, 5rem);
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 1.5rem;
+    font-size: 0.85rem; color: var(--white-dim);
+  }
+  .footer-brand {
+    font-family: 'Cinzel Decorative', serif;
+    color: var(--gold); font-size: 0.9rem;
+  }
+  .footer-links { display: flex; gap: 1.5rem; }
+  .footer-links a { color: var(--white-dim); text-decoration: none; transition: color 0.2s; }
+  .footer-links a:hover { color: var(--gold); }
+  .sui-badge {
+    display: flex; align-items: center; gap: 0.5rem;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 20px; padding: 0.4rem 0.9rem;
+    font-size: 0.75rem; color: var(--white-dim);
+  }
+  .sui-dot { width: 8px; height: 8px; border-radius: 50%; background: #4da2ff; }
+
+  /* ─── TOAST ─────────────────────────────────────── */
+  #toast {
+    position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(100px);
+    background: var(--card); border: 1px solid var(--gold-dim);
+    border-radius: 8px; padding: 0.9rem 1.5rem;
+    font-size: 0.9rem; color: var(--white);
+    transition: transform 0.4s cubic-bezier(0.23,1,0.32,1), opacity 0.4s;
+    opacity: 0; z-index: 999; white-space: nowrap;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+  }
+  #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+  /* ─── RESPONSIVE ─────────────────────────────────── */
+  @media (max-width: 640px) {
+    nav { display: none; }
+    .hero-stats { gap: 1.5rem; }
+    .stat-divider { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Star field -->
+<div id="starfield"></div>
+
+<!-- ═══ HEADER ═══ -->
+<header>
+  <div class="logo">
+    <span class="logo-icon">🧲</span>
+    MagnetChain
+  </div>
+  <nav>
+    <a href="#collect">Collect</a>
+    <a href="#how">How It Works</a>
+    <a href="#collection">My Collection</a>
+  </nav>
+  <button class="btn-connect" id="connectBtn" onclick="toggleWallet()">Connect Wallet</button>
+</header>
+
+<!-- ═══ HERO ═══ -->
+<section class="hero">
+  <p class="hero-eyebrow">Powered by Sui Blockchain</p>
+  <h1>Collect the <em>World</em><br>One Magnet at a Time</h1>
+  <p class="hero-sub">
+    Own authentic digital refrigerator magnets as on-chain NFTs.
+    Each country. Each culture. Yours forever on Sui.
+  </p>
+  <div class="hero-cta">
+    <button class="btn-primary" onclick="document.getElementById('collect').scrollIntoView({behavior:'smooth'})">Start Collecting</button>
+    <button class="btn-secondary" onclick="document.getElementById('how').scrollIntoView({behavior:'smooth'})">How It Works</button>
+  </div>
+  <div class="hero-stats">
+    <div class="stat">
+      <div class="stat-num">1</div>
+      <div class="stat-label">Country Live</div>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat">
+      <div class="stat-num">250</div>
+      <div class="stat-label">Total Supply</div>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat">
+      <div class="stat-num">∞</div>
+      <div class="stat-label">Countries Planned</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ COLLECT ═══ -->
+<section id="collect">
+  <div class="collect-header">
+    <p class="section-label">Available Now</p>
+    <h2 class="section-title">The Collection</h2>
+    <p>Each magnet is a unique NFT minted on the Sui blockchain.<br>
+    Limited editions per country. Proof of ownership on-chain.</p>
+  </div>
+
+  <div class="magnets-grid">
+
+    <!-- GREECE -->
+    <div class="magnet-card magnet-greece" onclick="openMintModal('greece')">
+      <div class="magnet-visual">
+        <div class="magnet-sun"></div>
+        <div class="acropolis">
+          <svg width="260" height="70" viewBox="0 0 260 70" fill="none">
+            <!-- Acropolis silhouette -->
+            <rect x="90" y="50" width="80" height="20" fill="#0a0e1a"/>
+            <rect x="100" y="35" width="60" height="15" fill="#0a0e1a"/>
+            <!-- Columns -->
+            <rect x="105" y="15" width="5" height="20" fill="#0a0e1a"/>
+            <rect x="115" y="15" width="5" height="20" fill="#0a0e1a"/>
+            <rect x="125" y="15" width="5" height="20" fill="#0a0e1a"/>
+            <rect x="135" y="15" width="5" height="20" fill="#0a0e1a"/>
+            <rect x="145" y="15" width="5" height="20" fill="#0a0e1a"/>
+            <rect x="100" y="10" width="60" height="5" fill="#0a0e1a"/>
+            <!-- Rock base -->
+            <path d="M80 65 Q130 40 180 65" fill="#0a0e1a"/>
+            <!-- Trees -->
+            <rect x="60" y="52" width="4" height="18" fill="#0a0e1a"/>
+            <ellipse cx="62" cy="48" rx="8" ry="10" fill="#0a0e1a"/>
+            <rect x="190" y="54" width="4" height="16" fill="#0a0e1a"/>
+            <ellipse cx="192" cy="50" rx="7" ry="9" fill="#0a0e1a"/>
+          </svg>
+        </div>
+      </div>
+      <div class="magnet-info">
+        <div class="magnet-country">
+          <span class="magnet-flag-emoji">🇬🇷</span>
+          Greece
+        </div>
+        <p class="magnet-desc">Land of gods, olive trees, and the deep blue Aegean — the cradle of civilization.</p>
+        <div class="magnet-meta">
+          <div class="magnet-price">
+            <span class="price-label">Price</span>
+            <span class="price-value">0.1 SUI</span>
+            <span class="price-usd">≈ $0.16 USD</span>
+          </div>
+          <div class="magnet-supply">
+            <span class="supply-label">Minted</span>
+            <div class="supply-bar"><div class="supply-fill" id="greeceFill" style="width: 32%"></div></div>
+            <span class="supply-count" id="greeceCount">80 / 250</span>
+          </div>
+        </div>
+        <button class="btn-mint" id="greeceMintBtn">Mint NFT Magnet</button>
+      </div>
+    </div>
+
+    <!-- COMING SOON: Italy -->
+    <div class="magnet-card coming-soon-card">
+      <span class="coming-soon-badge">Coming Soon</span>
+      <div class="magnet-visual" style="height:220px; background: linear-gradient(180deg, #009246 33%, white 33%, white 66%, #ce2b37 66%); display:flex; align-items:center; justify-content:center;">
+        <div style="font-size:3rem; opacity:0.3">🇮🇹</div>
+      </div>
+      <div class="magnet-info">
+        <div class="magnet-country"><span class="magnet-flag-emoji">🇮🇹</span> Italy</div>
+        <p class="magnet-desc">Rome, Venice, Tuscany — art, pasta, and passion etched in every stone.</p>
+        <div class="magnet-meta">
+          <div class="magnet-price">
+            <span class="price-label">Price</span>
+            <span class="price-value">0.1 SUI</span>
+          </div>
+          <div class="magnet-supply">
+            <span class="supply-label">Supply</span>
+            <span class="supply-count">250 total</span>
+          </div>
+        </div>
+        <button class="btn-mint" disabled>Coming Soon</button>
+      </div>
+    </div>
+
+    <!-- COMING SOON: Japan -->
+    <div class="magnet-card coming-soon-card">
+      <span class="coming-soon-badge">Coming Soon</span>
+      <div class="magnet-visual" style="height:220px; background: white; display:flex; align-items:center; justify-content:center;">
+        <div style="width:80px; height:80px; border-radius:50%; background:#bc002d; opacity:0.3;"></div>
+      </div>
+      <div class="magnet-info">
+        <div class="magnet-country"><span class="magnet-flag-emoji">🇯🇵</span> Japan</div>
+        <p class="magnet-desc">Cherry blossoms, temples, neon — ancient spirit meets electric future.</p>
+        <div class="magnet-meta">
+          <div class="magnet-price">
+            <span class="price-label">Price</span>
+            <span class="price-value">0.1 SUI</span>
+          </div>
+          <div class="magnet-supply">
+            <span class="supply-label">Supply</span>
+            <span class="supply-count">250 total</span>
+          </div>
+        </div>
+        <button class="btn-mint" disabled>Coming Soon</button>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══ HOW IT WORKS ═══ -->
+<section id="how">
+  <div class="how-header">
+    <p class="section-label">The Process</p>
+    <h2 class="section-title">How It Works</h2>
+  </div>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">01</div>
+      <div class="step-icon">👛</div>
+      <h3>Connect Wallet</h3>
+      <p>Connect your Sui Wallet to authenticate and pay for your magnet NFT.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <div class="step-icon">🧲</div>
+      <h3>Choose a Magnet</h3>
+      <p>Pick a country magnet from the collection. Each is a limited-edition NFT.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <div class="step-icon">⛓️</div>
+      <h3>Mint on Sui</h3>
+      <p>Your transaction is confirmed on the Sui blockchain in under a second.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">04</div>
+      <div class="step-icon">🏆</div>
+      <h3>Own Forever</h3>
+      <p>The NFT lives in your Sui wallet — truly yours, provably on-chain.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ MY COLLECTION ═══ -->
+<section id="collection">
+  <div class="collection-header">
+    <p class="section-label">Your Wallet</p>
+    <h2 class="section-title">My Collection</h2>
+  </div>
+  <div id="collectionEmpty" class="collection-empty">
+    <div class="collection-empty-icon">🧲</div>
+    <p>Your collection is empty.<br>Connect your wallet and mint your first country magnet to begin your journey.</p>
+    <button class="btn-primary" style="margin-top:1.5rem" onclick="toggleWallet()">Connect Wallet</button>
+  </div>
+  <div id="nftGrid" class="nft-grid" style="display:none"></div>
+</section>
+
+<!-- ═══ FOOTER ═══ -->
+<footer>
+  <div class="footer-brand">🧲 MagnetChain</div>
+  <div class="footer-links">
+    <a href="#">Docs</a>
+    <a href="https://suiexplorer.com" target="_blank">Explorer</a>
+    <a href="#">Discord</a>
+    <a href="#">Twitter</a>
+  </div>
+  <div class="sui-badge">
+    <div class="sui-dot"></div>
+    Sui Testnet
+  </div>
+</footer>
+
+<!-- ═══ MINT MODAL ═══ -->
+<div class="modal-overlay" id="mintModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <div id="modalForm">
+      <div class="modal-title">🧲 Mint Greece NFT</div>
+      <div class="modal-sub">You're about to mint a limited-edition Greece fridge magnet NFT on the Sui blockchain.</div>
+      <div class="modal-details">
+        <div class="detail-row">
+          <span class="detail-key">NFT Name</span>
+          <span class="detail-val">MagnetChain: Greece #081</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-key">Blockchain</span>
+          <span class="detail-val">Sui Testnet</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-key">Mint Price</span>
+          <span class="detail-val gold">0.1 SUI</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-key">Gas Fee (est.)</span>
+          <span class="detail-val">~0.000.1 SUI</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-key">Remaining Supply</span>
+          <span class="detail-val">170 / 250</span>
+        </div>
+      </div>
+      <div class="modal-notice">
+        📡 This transaction will be submitted to <strong>Sui Testnet</strong>.
+        Make sure your wallet is connected to testnet and has enough SUI tokens.
+        Get free testnet SUI from the <a href="https://faucet.sui.io" target="_blank" style="color:#7090d0">Sui Faucet</a>.
+      </div>
+      <button class="btn-mint" onclick="confirmMint()" id="confirmMintBtn">Confirm & Mint</button>
+    </div>
+    <div class="tx-status" id="txStatus">
+      <div class="tx-spinner" id="txSpinner"></div>
+      <div class="tx-success" id="txSuccessIcon" style="display:none">✅</div>
+      <div class="tx-msg" id="txMsg">Submitting transaction to Sui...</div>
+      <div class="tx-hash" id="txHash"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TOAST ═══ -->
+<div id="toast"></div>
+
+<script>
+// ─── STARS ────────────────────────────────────────────
+(function() {
+  const sf = document.getElementById('starfield');
+  for (let i = 0; i < 120; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const size = Math.random() * 2.5 + 0.5;
+    s.style.cssText = `
+      left:${Math.random()*100}%;top:${Math.random()*100}%;
+      width:${size}px;height:${size}px;
+      --d:${Math.random()*4+2}s;
+      --delay:${Math.random()*6}s;
+      --op:${Math.random()*0.7+0.1};
+    `;
+    sf.appendChild(s);
+  }
+})();
+
+// ─── STATE ────────────────────────────────────────────
+let walletConnected = false;
+let walletAddress = null;
+let myNFTs = [];
+
+// ─── WALLET ───────────────────────────────────────────
+async function toggleWallet() {
+  const btn = document.getElementById('connectBtn');
+  if (walletConnected) {
+    walletConnected = false; walletAddress = null; myNFTs = [];
+    btn.className = 'btn-connect';
+    btn.textContent = 'Connect Wallet';
+    updateCollection();
+    showToast('Wallet disconnected');
+    return;
+  }
+
+  btn.textContent = 'Connecting…';
+  btn.disabled = true;
+
+  // Try real Sui Wallet (window.suiWallet) or fallback to demo
+  try {
+    if (window.suiWallet) {
+      const resp = await window.suiWallet.requestPermissions();
+      const accounts = await window.suiWallet.getAccounts();
+      walletAddress = accounts[0];
+    } else if (window.ethereum) {
+      // fallback sim
+      throw new Error('No Sui wallet');
+    } else {
+      throw new Error('No wallet found');
+    }
+  } catch(e) {
+    // DEMO MODE
+    walletAddress = '0x' + Array(40).fill(0).map(()=>'0123456789abcdef'[Math.floor(Math.random()*16)]).join('');
+  }
+
+  walletConnected = true;
+  const short = walletAddress.slice(0,6) + '…' + walletAddress.slice(-4);
+  btn.className = 'btn-connect connected';
+  btn.textContent = '✓ ' + short;
+  btn.disabled = false;
+  updateCollection();
+  showToast('✓ Wallet connected — ' + short);
+}
+
+// ─── MODAL ────────────────────────────────────────────
+function openMintModal(country) {
+  if (!walletConnected) {
+    showToast('⚠ Please connect your wallet first');
+    return;
+  }
+  document.getElementById('mintModal').classList.add('active');
+  document.getElementById('modalForm').style.display = 'block';
+  document.getElementById('txStatus').classList.remove('visible');
+}
+
+function closeModal() {
+  document.getElementById('mintModal').classList.remove('active');
+  // Reset state after close
+  setTimeout(() => {
+    document.getElementById('modalForm').style.display = 'block';
+    document.getElementById('txStatus').classList.remove('visible');
+    document.getElementById('txSpinner').style.display = 'block';
+    document.getElementById('txSuccessIcon').style.display = 'none';
+  }, 300);
+}
+
+// Close on overlay click
+document.getElementById('mintModal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+// ─── CONTRACT ─────────────────────────────────────────
+const PACKAGE_ID = "0xee9c065d1e124af2dbab14d70e05c000aad8bf1bb50bc205088492fa105f1aa3";
+const CONFIG_ID  = "0xbda29a9b4bb8c2216fe83c9d83d01f07ff8e475d8b04118cc6af3693d41d6792";
+const MINT_PRICE_MIST = 100_000_000; // 0.1 SUI
+
+// ─── MINT ─────────────────────────────────────────────
+async function confirmMint() {
+  const btn = document.getElementById('confirmMintBtn');
+  btn.disabled = true; btn.textContent = 'Processing…';
+
+  document.getElementById('modalForm').style.display = 'none';
+  const status = document.getElementById('txStatus');
+  status.classList.add('visible');
+  document.getElementById('txMsg').textContent = 'Submitting transaction to Sui Testnet…';
+  document.getElementById('txHash').textContent = '';
+  document.getElementById('txSpinner').style.display = 'block';
+  document.getElementById('txSuccessIcon').style.display = 'none';
+
+  try {
+    // ── Load Sui SDK from CDN ──
+    const { Transaction } = await import('https://esm.sh/@mysten/sui@1.21.1/transactions');
+    const { SuiClient, getFullnodeUrl } = await import('https://esm.sh/@mysten/sui@1.21.1/client');
+
+    const client = new SuiClient({ url: getFullnodeUrl('testnet') });
+    const wallet = window.suiWallet;
+
+    if (!wallet) throw new Error('Sui Wallet extension not found. Please install it from https://suiwallet.com');
+
+    // Build the transaction
+    const tx = new Transaction();
+    // Split exact mint price from gas coin
+    const [paymentCoin] = tx.splitCoins(tx.gas, [tx.pure.u64(MINT_PRICE_MIST)]);
+    tx.moveCall({
+      target: `${PACKAGE_ID}::magnet_nft::mint_and_keep`,
+      arguments: [tx.object(CONFIG_ID), paymentCoin],
+    });
+    tx.setGasBudget(10_000_000);
+
+    document.getElementById('txMsg').textContent = 'Waiting for wallet approval…';
+
+    // Sign and execute
+    const result = await wallet.signAndExecuteTransaction({
+      transaction: tx,
+      options: { showEffects: true, showEvents: true },
+    });
+
+    const digest = result.digest;
+
+    // Show success
+    document.getElementById('txSpinner').style.display = 'none';
+    document.getElementById('txSuccessIcon').style.display = 'block';
+    document.getElementById('txMsg').innerHTML = '🎉 <strong>NFT Minted Successfully!</strong><br><span style="color:#a09880;font-size:0.85rem">Your Greece Magnet NFT is now in your wallet.</span>';
+    document.getElementById('txHash').innerHTML = `Tx: <a href="https://suiexplorer.com/txblock/${digest}?network=testnet" target="_blank" style="color:var(--gold)">${digest.slice(0,20)}…</a>`;
+
+    myNFTs.push({ id: digest, country: 'Greece', flag: '🇬🇷', num: 80 + myNFTs.length + 1 });
+    updateCollection();
+
+    const newCount = 80 + myNFTs.length;
+    document.getElementById('greeceCount').textContent = newCount + ' / 250';
+    document.getElementById('greeceFill').style.width = (newCount / 250 * 100) + '%';
+
+    showToast('🎉 Greece Magnet NFT minted!');
+
+  } catch (err) {
+    document.getElementById('txSpinner').style.display = 'none';
+    document.getElementById('txSuccessIcon').style.display = 'none';
+    document.getElementById('txMsg').innerHTML = `❌ <strong>Transaction failed</strong><br><span style="color:#a09880;font-size:0.85rem">${err.message}</span>`;
+    showToast('❌ Mint failed — check console');
+    console.error(err);
+  }
+
+  btn.disabled = false; btn.textContent = 'Mint NFT Magnet';
+}
+
+// ─── COLLECTION ───────────────────────────────────────
+function updateCollection() {
+  const empty = document.getElementById('collectionEmpty');
+  const grid = document.getElementById('nftGrid');
+
+  if (!walletConnected || myNFTs.length === 0) {
+    empty.style.display = 'block'; grid.style.display = 'none';
+    if (!walletConnected) {
+      empty.querySelector('p').innerHTML = 'Connect your wallet to view your collection.';
+    } else {
+      empty.querySelector('p').innerHTML = 'Your collection is empty.<br>Mint your first country magnet to begin your journey.';
+    }
+    return;
+  }
+
+  empty.style.display = 'none'; grid.style.display = 'grid';
+  grid.innerHTML = myNFTs.map(n => `
+    <div class="nft-item">
+      <div class="nft-visual">${n.flag}</div>
+      <div class="nft-label">${n.country} #${String(n.num).padStart(3,'0')}</div>
+    </div>
+  `).join('');
+}
+
+// ─── UTILS ────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3200);
+}
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+</script>
+
+</body>
+</html>
